@@ -1,0 +1,10 @@
+name: SignTP
+main: me.pookeythekid.SignTP.Main
+version: 1.0.3
+description: >
+             Teleportation Signs
+softdepend: [Vault]
+
+commands:
+  signtp:
+    description: Main command.

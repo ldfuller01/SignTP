@@ -1,0 +1,28 @@
+warpnames: examplewarp,pook,blah
+
+Warp ExampleWarp
+x: 1
+y: 60
+z: 100
+Pitch: 1
+Yaw: 1
+World: world
+End Warp
+
+Warp pook
+x: 1
+y: 60
+z: 100
+Pitch: 1
+Yaw: 1
+World: world
+End Warp
+
+Warp blah
+x: 1
+y: 60
+z: 100
+Pitch: 1
+Yaw: 1
+World: world
+End Warp

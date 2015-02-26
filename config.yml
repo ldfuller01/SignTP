@@ -1,0 +1,46 @@
+# These are different options of what you can put on the
+# first line of a sign to register it as a teleport sign.
+# Prefixes are color code compatible.
+# Just follow the format of the example to add more. You
+# may remove these examples at any time you wish, but never
+# leave nothing here.
+#
+# Do not have two tags with the same text; meaning, if you
+# were to remove the color codes from both of them, they would
+# be the same.
+#
+# Also note: Including color codes, prefixes may not be longer
+# than 15 characters. Any more than that, and they won't work.
+signPrefixes:
+- '&8[&9SignTP&8]'
+- '&9[Teleport]'
+
+# This is the plugin tag that will be used to send
+# players messages, such as the teleportation notification,
+# and the help menu.
+# Example: [SignTP] Teleported.
+# Set this to 'nothing' to have no tag.
+mainTag: '&8[&9SignTP&8]'
+
+# Whether or not SignTP should use economy to charge
+# players to use teleport signs. The signs will only
+# charge players if there's a price, preceded with a
+# $ sign, on the bottom line. Setting this to true and
+# putting nothing on the bottom line of a sign will
+# have no effect.
+#
+# Note: This plugin uses Vault for economy. This
+# makes it compatible with any plugin that manages
+# economy throught Vault, such as Essentials,
+# iConomy, etc.
+useEconomy: true
+
+# Should players be told that they're
+# teleported or can Captain Obvious take
+# a break?
+toggleTPMessage: true
+
+# If the above is set to true, this is
+# the message that players will get when
+# they're teleported.
+tpMessage: '&aTeleported.'
