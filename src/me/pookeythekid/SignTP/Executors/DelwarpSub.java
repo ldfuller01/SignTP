@@ -43,7 +43,7 @@ public class DelwarpSub {
 
 					String warpName = args[1].toLowerCase();
 
-					File file = new File(M.getDataFolder(), "warps\\" + warpName + ".yml");
+					File file = new File(M.getDataFolder(), "warps\\" + warpName + ".txt");
 
 					if (file.delete()) {
 						

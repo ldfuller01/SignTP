@@ -1,6 +1,6 @@
 name: SignTP
 main: me.pookeythekid.SignTP.Main
-version: 1.0.3
+version: 1.0.4
 description: >
              Teleportation Signs
 softdepend: [Vault]
