@@ -1,0 +1,39 @@
+Version 1.0.4
+* **The file mess is totally fixed now.** You can now transfer to this version from **both** the v1.0.1 and the v1.0.2 files!
+* Fixed /signtp delwarp which broke in v1.0.3. It broke because I forgot to adjust the command to the new text files.
+* **Updated config file**. The updates are pretty major; you're best off just deleting your old one if you had one.
+* Upgraded price formatting. Pricetags can now go before, after, on both sides of, or on either side of your actual price. You can also put as many numbers as you want, and you can put your pricetag wherever you want; the plugin will correct it for you! (Note: you still can't put more than one decimal.)
+* New config setting: pricetag. You can now have whatever you want as a currency sign. This includes whole words, like "waffles", or even phrases, like "costs this much"; the only limit is how much the sign line can hold.
+* New config setting: pricetagPosition. This determines how the pricetag will be formatted next to your price.
+* When you now click a sign with an invalid price, one of two things will happen: the price will correct itself and make the sign usable again, or the price will turn red and the sign will be unusable. The latter normally if not always happens only if the pricetag has spaces in it.
+* Cleaned up some potential minor bugs.
+
+Version 1.0.3
+* Updated to 1.8
+* **Fixed warp transfer!** Unfortunately it's probably too late for many people, but if updating from v1.0.1 it works perfectly.
+* Now using DataAPI by Skionz, instead of YAML config files.
+* Updated Vault implementation.
+
+Version 1.0.2
+* Added /SignTP Delwarp: Delete a warp.
+* Added permission node: signtp.delwarp - Grant access to /SignTP Delwarp
+* Modified command /SignTP Warp: Now has the optional argument [Player] (/SignTP Warp [Player]), to teleport another player.
+* Added permission node: signtp.warp.other - Grant access to teleporting other players with /SignTP Warp [Player].
+* **Modified config section: "signPrefix"** - Is now "signPrefixes". You may now set unlimited sign prefixes, formatted in a vertical list.
+* **Added config section: "mainTag"** - You may now set the plugin tag that players receive with chat notifications (which is [SignTP] by default) to whatever you want, including nothing at all.
+* **Added config section: "tpMessage"** - You may now set the message that players receive when they teleport, if toggleTPMessage is set to true.
+* **If you wish not to break your plugin, delete your current config file before updating!** The config will not update automatically; you must go in and reconfigure the plugin.
+* **Relocated warp data.** Warps are no longer stored in warps.txt. They are now stored in individual <warpname>.yml files inside the "warps" directory of SignTP's plugin directory. Don't worry, the plugin moves the files automatically.
+* Added the ability to overwrite warps in-game. Use /SignTP Setwarp <Warp Name> on an existing warp, and the plugin will have you verify if you would like to overwrite it.
+* **Changed the colors of the default SignTP tag.** This means old defaultly-colored signs will no longer work, unless you add their prefixes to your signPrefixes in the config.
+* Synced the format of a sign price to match that of the server's main economy-management plugin's settings. For example: If an economy-management plugin specifies that money should be in a "$1.23" format, SignTP will adjust the sign's price to match that.
+* Added some new, more specific, more descriptive comments in the config.
+* Fixed and added various safety features.
+* Fixed all known minor bugs.
+* Revolutionized sign teleport plugins.
+
+Version 1.0.1
+* Fixed redundancy issue while storing warps: Stringbuffer wasn't cleared each time it was appended a new warp.
+
+Version 1.0
+* Made plugin functional.
