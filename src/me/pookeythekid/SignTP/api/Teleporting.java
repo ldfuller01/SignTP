@@ -1,7 +1,8 @@
 package me.pookeythekid.SignTP.api;
 
+import java.io.File;
+
 import me.pookeythekid.SignTP.Main;
-import me.pookeythekid.SignTP.Messages.Msgs;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -61,9 +62,7 @@ public class Teleporting {
 
 			loc = target.getLocation();
 
-		// MyConfig warpFile = M.configManager.getNewConfig("warps\\" + warpName.toLowerCase() + ".yml");
-		
-		DataFile warpFile = new DataFile(M.getDataFolder() + "\\warps\\" + warpName.toLowerCase(), "txt");
+		DataFile warpFile = new DataFile(M.getDataFolder() + File.separator + "warps" + File.separator + warpName.toLowerCase(), "txt");
 
 		double x = warpFile.getDouble("x");
 
@@ -141,9 +140,7 @@ public class Teleporting {
 
 		Location loc = target.getLocation();
 
-		// MyConfig warpFile = M.configManager.getNewConfig("warps\\" + warpName.toLowerCase() + ".yml");
-		
-		DataFile warpFile = new DataFile(M.getDataFolder() + "\\warps\\" + warpName.toLowerCase(), "txt");
+		DataFile warpFile = new DataFile(M.getDataFolder() + File.separator + "warps" + File.separator + warpName.toLowerCase(), "txt");
 
 		double x = warpFile.getDouble("x");
 

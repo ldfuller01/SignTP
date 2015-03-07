@@ -13,8 +13,6 @@ import me.pookeythekid.SignTP.Permissions.Permissions;
 import me.pookeythekid.SignTP.api.ReloadWarps;
 import net.milkbowl.vault.economy.Economy;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -25,7 +23,7 @@ import com.skionz.dataapi.DataFile;
 
 public class Main extends JavaPlugin {
 
-	public final Logger logger = Logger.getLogger("Minecraft");
+	public Logger logger = getLogger();
 
 
 	/**
@@ -55,9 +53,6 @@ public class Main extends JavaPlugin {
 	public HashMap<Player, String> overwriters = new HashMap<Player, String>();
 
 
-	// public MyConfigManager configManager;
-
-
 	private Permissions Permissions = new Permissions();
 
 	private SignCreation SignCreation = new SignCreation(this);
@@ -75,28 +70,27 @@ public class Main extends JavaPlugin {
 
 	public static Economy economy = null;
 
-	private boolean setupEconomy() {
+	private boolean setupEconomy()
+    {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
 
-		if (getServer().getPluginManager().getPlugin("Vault") == null) {
-
-			return false;
-
-		}
-
-		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-
-		if (rsp == null) {
-
-			return false;
-
-		}
-
-		economy = rsp.getProvider();
-
-		return economy != null;
-
+        return (economy != null);
+    }
+	
+	public void disable() {
+		
+		this.setEnabled(false);
+		
 	}
-
+	
+	public void enable() {
+		
+		this.setEnabled(true);
+		
+	}
 
 	@Override
 	public void onEnable() {
@@ -135,8 +129,6 @@ public class Main extends JavaPlugin {
 
 			saveDefaultConfig();
 
-			// this.configManager = new MyConfigManager(this);
-
 			File oldWarpsFile = new File(getDataFolder(), "warps.txt");
 			
 			File dir = new File(getDataFolder(), "warps");
@@ -160,7 +152,7 @@ public class Main extends JavaPlugin {
 
 					if (!file.getName().endsWith(".yml")) {
 
-						DataFile warpFile = new DataFile(dir + "\\" + file.getName().replace(".txt", ""), "txt");
+						DataFile warpFile = new DataFile(dir + File.separator + file.getName().replace(".txt", ""), "txt");
 
 						for (String s : this.warpMap.get(file.getName().replace(".txt", "")).split(" - ")) {
 
@@ -214,21 +206,23 @@ public class Main extends JavaPlugin {
 					
 					if (file.getName().endsWith(".yml")) {
 						
-						FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
+						DataFile ymlFile = new DataFile(dir + File.separator + file.getName().replace(".yml", ""), "yml");
 						
-						DataFile dataFile = new DataFile(dir + "\\" + file.getName().replace(".yml", ""), "txt");
+						DataFile dataFile = new DataFile(dir + File.separator + file.getName().replace(".yml", ""), "txt");
 						
-						dataFile.set("x", fileConfig.getDouble("x"));
+						// Remove the ' characters from the strings. The old YAML files like single quotes, DataAPI does not.
 						
-						dataFile.set("y", fileConfig.getDouble("y"));
+						dataFile.set("x", Double.valueOf(ymlFile.getString("x").replace("'", "")));
 						
-						dataFile.set("z", fileConfig.getDouble("z"));
+						dataFile.set("y", Double.valueOf(ymlFile.getString("y").replace("'", "")));
 						
-						dataFile.set("pitch", (float) fileConfig.getDouble("pitch"));
+						dataFile.set("z", Double.valueOf(ymlFile.getString("z").replace("'", "")));
 						
-						dataFile.set("yaw", (float) fileConfig.getDouble("yaw"));
+						dataFile.set("pitch", Float.valueOf(ymlFile.getString("pitch").replace("'", "")));
 						
-						dataFile.set("world", fileConfig.getString("world"));
+						dataFile.set("yaw", Float.valueOf(ymlFile.getString("yaw").replace("'", "")));
+						
+						dataFile.set("world", ymlFile.getString("world"));
 						
 						file.delete();
 						
@@ -297,7 +291,12 @@ public class Main extends JavaPlugin {
 
 	}
 
-
+	@Override
+	public void onDisable() {
+		
+		Permissions.removePerms(getServer().getPluginManager());
+		
+	}
 
 
 }

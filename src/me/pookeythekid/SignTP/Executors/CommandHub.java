@@ -1,8 +1,8 @@
 package me.pookeythekid.SignTP.Executors;
 
 import me.pookeythekid.SignTP.Main;
-import me.pookeythekid.SignTP.Messages.Msgs;
 import me.pookeythekid.SignTP.Permissions.Permissions;
+import me.pookeythekid.SignTP.api.Msgs;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

@@ -2,9 +2,9 @@ package me.pookeythekid.SignTP.Listeners;
 
 
 import me.pookeythekid.SignTP.Main;
-import me.pookeythekid.SignTP.Messages.Msgs;
 import me.pookeythekid.SignTP.Permissions.Permissions;
 import me.pookeythekid.SignTP.api.Colors;
+import me.pookeythekid.SignTP.api.Msgs;
 import me.pookeythekid.SignTP.api.Signs;
 
 import org.bukkit.ChatColor;
@@ -51,9 +51,15 @@ public class SignCreation implements Listener {
 
 				Signs.markSignUsable(e);
 
-				if (!M.economyIsOn && Signs.signHasPrice(e))
+				if (!M.economyIsOn && Signs.signHasPrice(e)) {
 
-					p.sendMessage(Msgs.EcoOffWarn());
+					if (M.getConfig().getBoolean("useEconomy"))
+						p.sendMessage(Msgs.EcoOffError());
+					
+					else
+						p.sendMessage(Msgs.EcoOffWarn());
+
+				}
 
 				if (M.economyIsOn) {
 
@@ -64,9 +70,9 @@ public class SignCreation implements Listener {
 						p.sendMessage(Msgs.InvalidPrice());
 
 					}
-					
+
 					else
-						
+
 						Signs.formatPrice(e);
 
 				}

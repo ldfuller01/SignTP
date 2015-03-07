@@ -1,8 +1,8 @@
 package me.pookeythekid.SignTP.Listeners;
 
 import me.pookeythekid.SignTP.Main;
-import me.pookeythekid.SignTP.Messages.Msgs;
 import me.pookeythekid.SignTP.Permissions.Permissions;
+import me.pookeythekid.SignTP.api.Msgs;
 import me.pookeythekid.SignTP.api.Signs;
 import me.pookeythekid.SignTP.api.Teleporting;
 import net.milkbowl.vault.economy.Economy;
@@ -54,46 +54,41 @@ public class SignUsage implements Listener {
 
 		if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-			if (clickedBlock.getType() == Material.SIGN
-					|| clickedBlock.getType() == Material.SIGN_POST
+			if (clickedBlock.getType() == Material.SIGN_POST
 					|| clickedBlock.getType() == Material.WALL_SIGN) {
 
 				Sign sign = (Sign) clickedBlock.getState();
 
 				if (Signs.signIsValid(sign)) {
+					
+					/*
+					 * Cancels the event so the player doesn't accidentally place a block on the sign.
+					 * Moved from the next block to this one, so players without permission can't build
+					 * all over the sign.
+					 */
+					e.setCancelled(true);
 
 					if (p.hasPermission(Permissions.useSign)) {
 						
-						/*
-						 * Cancels the event so the player doesn't accidentally place a block on the sign.
-						 */
-						e.setCancelled(true);
-
-						if (!M.economyIsOn || !Signs.signHasPrice(sign)) {
+						if (!M.economyIsOn || !Signs.signHasPrice(sign))
 
 							Teleporting.teleport(p, null, sign.getLine(1));
 
-						}
-
 						else if (M.economyIsOn && Signs.signHasPrice(sign)) {
 							
-							if (!Signs.hasPriceFormat(sign))
-								
-								Signs.formatPrice(sign);
+							Signs.formatPrice(sign);
 
 							double price = Signs.getPrice(sign);
 
-							if (economy.getBalance(p) >= price) {
+							if (economy.has(p, price)) {
 
 								economy.withdrawPlayer(p, price);
 
 								Teleporting.teleport(p, null, sign.getLine(1));
 
-							} else if (economy.getBalance(p) < price) {
+							} else if (!economy.has(p, price))
 
 								p.sendMessage(Msgs.NotEnoughCash());
-
-							}
 
 						}
 

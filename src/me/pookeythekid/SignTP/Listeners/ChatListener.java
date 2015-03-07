@@ -2,7 +2,7 @@ package me.pookeythekid.SignTP.Listeners;
 
 import me.pookeythekid.SignTP.Main;
 import me.pookeythekid.SignTP.Executors.SetwarpSub;
-import me.pookeythekid.SignTP.Messages.Msgs;
+import me.pookeythekid.SignTP.api.Msgs;
 
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;

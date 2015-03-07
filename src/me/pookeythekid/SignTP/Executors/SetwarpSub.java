@@ -1,8 +1,10 @@
 package me.pookeythekid.SignTP.Executors;
 
+import java.io.File;
+
 import me.pookeythekid.SignTP.Main;
-import me.pookeythekid.SignTP.Messages.Msgs;
 import me.pookeythekid.SignTP.Permissions.Permissions;
+import me.pookeythekid.SignTP.api.Msgs;
 import me.pookeythekid.SignTP.api.ReloadWarps;
 
 import org.bukkit.ChatColor;
@@ -90,7 +92,7 @@ public class SetwarpSub {
 		
 		// MyConfig warpFile = M.configManager.getNewConfig("warps\\" + warpName.toLowerCase() + ".yml");
 		
-		DataFile warpFile = new DataFile(M.getDataFolder() + "\\warps\\" + warpName.toLowerCase(), "txt");
+		DataFile warpFile = new DataFile(M.getDataFolder() + File.separator + "warps" + File.separator + warpName.toLowerCase(), "txt");
 		
 		Location loc = p.getLocation();
 		

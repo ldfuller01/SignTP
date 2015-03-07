@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.pookeythekid.SignTP.Main;
-import me.pookeythekid.SignTP.Messages.Msgs;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.SignChangeEvent;
@@ -176,26 +174,44 @@ public class Signs {
 	}
 
 	/**
-	 * Checks if the given sign has a price on the fourth line.
+	 * Checks if the given sign has any form of a price on the fourth line.
 	 * 
 	 * @param sign - Sign whose price to check.
-	 * @return {@code true} if the fourth line both is prefixed with a dollar sign and has content after the dollar sign.
+	 * @return {@code true} if the fourth line both has numbers in it.
 	 */
 	public boolean signHasPrice(Sign sign) {
+		
+		if (sign.getLine(3).contains(M.getConfig().getString("pricetag")))
+			return true;
 
-		return sign.getLine(3) != null  &&  sign.getLine(3) != ""  &&  !this.signPriceInvalid(sign);
+		for (char c : sign.getLine(3).toCharArray())
+
+			if (this.isInteger(String.valueOf(c)))
+
+				return true;
+
+		return false;
 
 	}
 
 	/**
-	 * Checks if the sign in the given SignChangeEvent has a price on the fourth line.
+	 * Checks if the sign in the given SignChangeEvent has some form of a price on the fourth line.
 	 * 
 	 * @param e - Event to use.
-	 * @return {@code true} if the fourth line both is prefixed with a dollar sign and has content after the dollar sign.
+	 * @return {@code true} if the fourth line has numbers in it.
 	 */
 	public boolean signHasPrice(SignChangeEvent e) {
+		
+		if (e.getLine(3).contains(M.getConfig().getString("pricetag")))
+			return true;
 
-		return e.getLine(3) != null  &&  e.getLine(3) != ""  &&  !this.signPriceInvalid(e);
+		for (char c : e.getLine(3).toCharArray())
+
+			if (this.isInteger(String.valueOf(c)))
+
+				return true;
+
+		return false;
 
 	}
 
@@ -251,13 +267,23 @@ public class Signs {
 
 		}
 
-		if (!priceLine.startsWith("$") || priceLine.endsWith("$"))
+		if (priceLine.equals("") || priceLine.equals(null))
 
 			return true;
 
-		if (!this.isInteger(String.valueOf(priceLine.replace("$", "").replace(".", ""))))
+		else {
 
-			return true;
+			if (!priceLine.contains(M.getConfig().getString("pricetag")))
+
+				return true;
+
+			String priceLine2 = priceLine.replace(M.getConfig().getString("pricetag"), "").replace(".", "");
+
+			if (!this.isInteger(priceLine2))
+
+				return true;
+
+		}
 
 
 		return false;
@@ -293,21 +319,21 @@ public class Signs {
 
 		}
 
-		if (!priceLine.equals("")) {
+		if (priceLine.equals("") || priceLine.equals(null))
 
-			if (!priceLine.startsWith("$") || priceLine.endsWith("$")) {
+			return true;
 
-				return true;
+		else {
 
-			}
-
-			String priceLine2 = priceLine.replace("$", "").replace(".", "");
-
-			if (!this.isInteger(priceLine2)) {
+			if (!priceLine.contains(M.getConfig().getString("pricetag")))
 
 				return true;
 
-			}
+			String priceLine2 = priceLine.replace(M.getConfig().getString("pricetag"), "").replace(".", "");
+
+			if (!this.isInteger(priceLine2))
+
+				return true;
 
 		}
 
@@ -400,11 +426,9 @@ public class Signs {
 				 */
 				List<Character> lowerCList = new ArrayList<Character>();
 
-				for (char c : lowerCases) {
+				for (char c : lowerCases)
 
 					lowerCList.add(c);
-
-				}
 
 				char[] upperCases = new String("ABCDEFGHIJKLMNOPQRSTUVWXYZ").toCharArray();
 
@@ -413,11 +437,9 @@ public class Signs {
 				 */
 				List<Character> upperCList = new ArrayList<Character>();
 
-				for (char c : upperCases) {
+				for (char c : upperCases)
 
 					upperCList.add(c);
-
-				}
 
 				int index = 0;
 
@@ -452,24 +474,24 @@ public class Signs {
 	}
 
 	/**
-	 * Gets the amount of money required to use the given sign.
+	 * Gets the amount of money required to use the given sign, in the format that the server's economy plugin wants it. For example, 1.23
 	 * 
 	 * @param sign - Sign to get the price of.
-	 * @return The double value of the amount of money required to use the sign.
+	 * @return The double value of the amount of money required to use the sign. 0.0 if economy is disabled.
 	 */
 	public double getPrice(Sign sign) {
 
-		int digits = Main.economy.fractionalDigits();
+		String priceLine = sign.getLine(3).replace(M.getConfig().getString("pricetag"), "");
 
-		String priceLine = sign.getLine(3).replace("$", "");
+		if (priceLine.equals(""))
 
-		StringBuffer zeroFormat = new StringBuffer();
+			return 0D;
 
-		for (int i = 0; i < digits; i++) {
+		if (M.economyIsOn) {
 
-			if (digits == 0)
+			int digits = Main.economy.fractionalDigits();
 
-				break;
+			StringBuffer zeroFormat = new StringBuffer();
 
 			if (digits < 0) {
 
@@ -485,83 +507,85 @@ public class Signs {
 
 				}
 
-				break;
-
 			}
 
-			if (priceLine.charAt(i) != '.')
+			for (int i = 0; i < digits; i++) {
 
-				zeroFormat.append("0");
-
-			else
-
-				zeroFormat.append(String.valueOf(priceLine.charAt(i)));
-
-		}
-
-		DecimalFormat dm = new DecimalFormat(zeroFormat.toString());
-
-		if (priceLine.equals(""))
-
-			return 0D;
-
-		return Double.valueOf(dm.format(Double.valueOf(priceLine)));
-
-	}
-
-	/**
-	 * Gets the amount of money required to use the given sign.
-	 * 
-	 * @param e - Event to use.
-	 * @return The double value of the amount of money required to use the sign.
-	 */
-	public double getPrice(SignChangeEvent e) {
-
-		int digits = Main.economy.fractionalDigits();
-
-		String priceLine = e.getLine(3).replace("$", "");
-
-		StringBuffer zeroFormat = new StringBuffer();
-
-		if (digits < 0) {
-
-			for (char c : priceLine.toCharArray()) {
-
-				if (c != '.')
+				if (priceLine.charAt(i) != '.')
 
 					zeroFormat.append("0");
 
 				else
 
-					zeroFormat.append(String.valueOf(c));
+					zeroFormat.append(String.valueOf(priceLine.charAt(i)));
 
 			}
 
-		}
+			DecimalFormat dm = new DecimalFormat(zeroFormat.toString());
 
-		for (int i = 0; i < digits; i++) {
-
-			Bukkit.broadcastMessage("This is a test");
-
-			Bukkit.broadcastMessage(String.valueOf(priceLine.charAt(i)));
-
-			if (priceLine.charAt(i) != '.')
-
-				zeroFormat.append("0");
-
-			else
-
-				zeroFormat.append(String.valueOf(priceLine.charAt(i)));
+			return Double.valueOf(dm.format(Double.valueOf(priceLine)));
 
 		}
 
-		DecimalFormat dm = new DecimalFormat(zeroFormat.toString());
+		return 0D;
+
+	}
+
+	/**
+	 * Gets the amount of money required to use the given sign, in the format that the server's economy plugin wants it. For example, 1.23
+	 * 
+	 * @param e - Event to use.
+	 * @return The double value of the amount of money required to use the sign. 0.0 if economy is disabled.
+	 */
+	public double getPrice(SignChangeEvent e) {
+
+		String priceLine = e.getLine(3).replace(M.getConfig().getString("pricetag"), "");
 
 		if (priceLine.equals(""))
 
 			return 0D;
 
-		return Double.valueOf(dm.format(Double.valueOf(priceLine)));
+		if (M.economyIsOn) {
+
+			int digits = Main.economy.fractionalDigits();
+
+			StringBuffer zeroFormat = new StringBuffer();
+
+			if (digits < 0) {
+
+				for (char c : priceLine.toCharArray()) {
+
+					if (c != '.')
+
+						zeroFormat.append("0");
+
+					else
+
+						zeroFormat.append(String.valueOf(c));
+
+				}
+
+			}
+
+			for (int i = 0; i < digits; i++) {
+
+				if (priceLine.charAt(i) != '.')
+
+					zeroFormat.append("0");
+
+				else
+
+					zeroFormat.append(String.valueOf(priceLine.charAt(i)));
+
+			}
+
+			DecimalFormat dm = new DecimalFormat(zeroFormat.toString());
+
+			return Double.valueOf(dm.format(Double.valueOf(priceLine)));
+
+		}
+
+		return 0D;
 
 	}
 
@@ -571,13 +595,13 @@ public class Signs {
 	 * @param sign - Sign to check.
 	 * @return {@code true} if the sign has a correctly formatted pricetag.
 	 */
-	public boolean hasPriceFormat(Sign sign) {
+	/*public boolean hasPriceFormat(Sign sign) {
 
 		if (this.signPriceInvalid(sign))
 
 			return false;
 
-		String priceLine = sign.getLine(3).replace("$", "");
+		String priceLine = sign.getLine(3).replace(M.getConfig().getString("pricetag"), "");
 
 		char[] chars = priceLine.toCharArray();
 
@@ -613,7 +637,7 @@ public class Signs {
 
 		return false;
 
-	}
+	}*/
 
 	/**
 	 * Gives the sign a price with the same currency format as the server's economy plugin.
@@ -630,19 +654,58 @@ public class Signs {
 
 		}
 
-		String stringPrice = String.valueOf(this.getPrice(sign));
+		String price = String.valueOf(this.getPrice(sign));
+		
+		String stringPrice = sign.getLine(3);
 
-		if (stringPrice.endsWith(".0")) {
+		int decIndex = 0;
 
-			String newPrice = stringPrice.replace(".0", "");
+		for (char c : price.toCharArray())
 
-			sign.setLine(3, "$" + newPrice);
+			if (c != '.')
+				decIndex++;
 
-			return;
+		boolean allZeroes = true;
 
-		}
+		for (char c : price.substring(decIndex + 1).toCharArray())
 
-		sign.setLine(3, "$" + stringPrice);
+			if (c != '0')
+				allZeroes = false;
+
+		if (allZeroes && M.getConfig().getBoolean("trimZeroes"))
+			price = price.substring(0, decIndex);
+
+		if (!M.getConfig().getString("pricetag").isEmpty())
+
+			switch (M.getConfig().getString("pricetagPosition")) {
+
+			case "after":
+				sign.setLine(3, price + M.getConfig().getString("pricetag"));
+				break;
+
+			case "both":
+				sign.setLine(3, M.getConfig().getString("pricetag") + price + M.getConfig().getString("pricetag"));
+				break;
+
+			case "either":
+				int length = stringPrice.length() % 2 == 0 ? stringPrice.length() - 1 : stringPrice.length();
+				String firstHalf = price.substring(0, length / 2 - 1);
+				String secondHalf = price.substring(length / 2, price.length() - 1);
+
+				if (firstHalf.contains(M.getConfig().getString("pricetag")))
+					sign.setLine(3, M.getConfig().getString("pricetag") + price);
+				
+				else if (secondHalf.contains(M.getConfig().getString("pricetag")))
+					sign.setLine(3, price + M.getConfig().getString("pricetag"));
+				
+				break;
+
+			default:
+			case "before":
+				sign.setLine(3, M.getConfig().getString("pricetag") + price);
+				break;
+
+			}
 
 	}
 
@@ -661,19 +724,58 @@ public class Signs {
 
 		}
 
-		String stringPrice = String.valueOf(this.getPrice(e));
+		String price = String.valueOf(this.getPrice(e));
+		
+		String stringPrice = e.getLine(3);
 
-		if (stringPrice.endsWith(".0")) {
+		int decIndex = 0;
 
-			String newPrice = stringPrice.replace(".0", "");
+		for (char c : price.toCharArray())
 
-			e.setLine(3, "$" + newPrice);
+			if (c != '.')
+				decIndex++;
 
-			return;
+		boolean allZeroes = true;
 
-		}
+		for (char c : price.substring(decIndex + 1).toCharArray())
 
-		e.setLine(3, "$" + stringPrice);
+			if (c != '0')
+				allZeroes = false;
+
+		if (allZeroes && M.getConfig().getBoolean("trimZeroes"))
+			price = price.substring(0, decIndex);
+
+		if (!M.getConfig().getString("pricetag").isEmpty())
+
+			switch (M.getConfig().getString("pricetagPosition")) {
+
+			case "after":
+				e.setLine(3, price + M.getConfig().getString("pricetag"));
+				break;
+
+			case "both":
+				e.setLine(3, M.getConfig().getString("pricetag") + price + M.getConfig().getString("pricetag"));
+				break;
+
+			case "either":
+				int length = stringPrice.length() % 2 == 0 ? stringPrice.length() - 1 : stringPrice.length();
+				String firstHalf = price.substring(0, length / 2 - 1);
+				String secondHalf = price.substring(length / 2, price.length() - 1);
+
+				if (firstHalf.contains(M.getConfig().getString("pricetag")))
+					e.setLine(3, M.getConfig().getString("pricetag") + price);
+				
+				else if (secondHalf.contains(M.getConfig().getString("pricetag")))
+					e.setLine(3, price + M.getConfig().getString("pricetag"));
+				
+				break;
+
+			default:
+			case "before":
+				e.setLine(3, M.getConfig().getString("pricetag") + price);
+				break;
+
+			}
 
 	}
 

@@ -3,8 +3,8 @@ package me.pookeythekid.SignTP.Executors;
 import java.io.File;
 
 import me.pookeythekid.SignTP.Main;
-import me.pookeythekid.SignTP.Messages.Msgs;
 import me.pookeythekid.SignTP.Permissions.Permissions;
+import me.pookeythekid.SignTP.api.Msgs;
 import me.pookeythekid.SignTP.api.ReloadWarps;
 
 import org.bukkit.ChatColor;
@@ -43,7 +43,7 @@ public class DelwarpSub {
 
 					String warpName = args[1].toLowerCase();
 
-					File file = new File(M.getDataFolder(), "warps\\" + warpName + ".txt");
+					File file = new File(M.getDataFolder(), "warps" + File.separator + warpName + ".txt");
 
 					if (file.delete()) {
 						
