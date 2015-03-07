@@ -29,33 +29,9 @@ public class Signs {
 	}
 
 	/**
-	 * Makes a lower-cased character advance to upper case. Doesn't really have much to do with in-game signs.
-	 * 
-	 * @param letter - Letter to modify.
-	 * @return A character with a char value that is 32 lower than {@code letter}'s char value.
-	 */
-	private char toUpperChar(char letter) {
-
-		return (char) ((int) letter - 32);
-
-	}
-
-	/**
-	 * Makes an upper-cased character decline to lower case. Doesn't really have much to do with in-game signs.
-	 * 
-	 * @param letter - Letter to modify.
-	 * @return A character with a char value that is 32 higher than {@code letter}'s char value.
-	 */
-	private char toLowerChar(char letter) {
-
-		return (char) ((int) letter + 32);
-
-	}
-
-	/**
 	 * Checks if the provided string is an integer.
 	 * 
-	 * @param str - String to check.
+	 * @param str String to check.
 	 * @return {@code true} if the string is an integer.
 	 */
 	private boolean isInteger(String str) {
@@ -103,7 +79,7 @@ public class Signs {
 	/**
 	 * Gets the first line of the given sign.
 	 * 
-	 * @param sign - Sign to get prefix from.
+	 * @param sign Sign to get prefix from.
 	 * @return The first line of the given sign.
 	 */
 	public String getPrefix(Sign sign) {
@@ -128,7 +104,7 @@ public class Signs {
 	/**
 	 * Checks if a sign has a valid SignTP prefix.
 	 * 
-	 * @param sign - Sign to check prefix of.
+	 * @param sign Sign to check prefix of.
 	 * @return {@code true} if the given sign has a valid SignTP prefix.
 	 */
 	public boolean signHasPrefix(Sign sign) {
@@ -152,7 +128,7 @@ public class Signs {
 	/**
 	 * Checks if the sign from the given SignChangeEvent has a valid SignTP prefix.
 	 * 
-	 * @param e - Event to use.
+	 * @param e Event to use.
 	 * @return {@code true} if the sign in the given SignChangeEvent has a valid SignTP prefix.
 	 */
 	public boolean signHasPrefix(SignChangeEvent e) {
@@ -176,12 +152,15 @@ public class Signs {
 	/**
 	 * Checks if the given sign has any form of a price on the fourth line.
 	 * 
-	 * @param sign - Sign whose price to check.
+	 * @param sign Sign whose price to check.
 	 * @return {@code true} if the fourth line both has numbers in it.
 	 */
 	public boolean signHasPrice(Sign sign) {
 		
-		if (sign.getLine(3).contains(M.getConfig().getString("pricetag")))
+		String priceLine = ChatColor.stripColor(sign.getLine(3));
+
+		if (!M.getConfig().getString("pricetag").isEmpty() && priceLine.contains(M.getConfig().getString("pricetag")))
+
 			return true;
 
 		for (char c : sign.getLine(3).toCharArray())
@@ -197,12 +176,15 @@ public class Signs {
 	/**
 	 * Checks if the sign in the given SignChangeEvent has some form of a price on the fourth line.
 	 * 
-	 * @param e - Event to use.
+	 * @param e Event to use.
 	 * @return {@code true} if the fourth line has numbers in it.
 	 */
 	public boolean signHasPrice(SignChangeEvent e) {
 		
-		if (e.getLine(3).contains(M.getConfig().getString("pricetag")))
+		String priceLine = ChatColor.stripColor(e.getLine(3));
+
+		if (!M.getConfig().getString("pricetag").isEmpty() && priceLine.contains(M.getConfig().getString("pricetag")))
+
 			return true;
 
 		for (char c : e.getLine(3).toCharArray())
@@ -218,7 +200,7 @@ public class Signs {
 	/**
 	 * Checks if the given sign meets the minimum requirements of a SignTP sign.
 	 * 
-	 * @param sign - Sign to check validity of.
+	 * @param sign Sign to check validity of.
 	 * @return {@code true} if it has a valid SignTP prefix and addresses a valid warp name.
 	 */
 	public boolean signIsValid(Sign sign) {
@@ -230,7 +212,7 @@ public class Signs {
 	/**
 	 * Checks if the sign in the given SignChangeEvent meets the minimum requirements of a SignTP sign.
 	 * 
-	 * @param e - Event to use.
+	 * @param e Event to use.
 	 * @return {@code true} if it has a valid SignTP prefix and addresses a valid warp name.
 	 */
 	public boolean signIsValid(SignChangeEvent e) {
@@ -242,12 +224,12 @@ public class Signs {
 	/**
 	 * Checks if the given sign's price tag is invalid.
 	 * 
-	 * @param sign - Sign to check the pricetag of.
+	 * @param sign Sign to check the pricetag of.
 	 * @return {@code true} if the price is not in a format such as "$1.99".
 	 */
 	public boolean signPriceInvalid(Sign sign) {
 
-		String priceLine = sign.getLine(3);
+		String priceLine = ChatColor.stripColor(sign.getLine(3));
 
 		int decimals = 0;
 
@@ -294,12 +276,12 @@ public class Signs {
 	/**
 	 * Checks if the sign in the given SignChangeEvent's price is invalid.
 	 * 
-	 * @param e - Event to use.
+	 * @param e Event to use.
 	 * @return {@code true} if the price is not in a format such as "$1.99".
 	 */
 	public boolean signPriceInvalid(SignChangeEvent e) {
 
-		String priceLine = e.getLine(3);
+		String priceLine = ChatColor.stripColor(e.getLine(3));
 
 		int decimals = 0;
 
@@ -344,12 +326,53 @@ public class Signs {
 	}
 
 	/**
-	 * Marks the sign in the given SignChangeEvent to be unusable by giving it a red prefix.
+	 * Marks the given sign to be unusable by giving it a red prefix.
 	 * 
-	 * @param e - Event to use.
+	 * @param sign Sign to use.
 	 * @return {@code true} if the sign is invalid because the prefix is too long.
 	 */
-	public boolean markSignInvalid(SignChangeEvent e) {
+	public boolean markSignInvalid(Sign sign) {
+
+		List<String> cfgPrefixList = this.getCfgPrefixes();
+
+		String signPrefix = Colors.noChatColors(sign.getLine(0));
+
+		for (String s : cfgPrefixList) {
+
+			String cfgPrefix = Colors.noChatColors(s);
+
+			String cfgPrefixCodes = s;
+
+			if (cfgPrefix.equalsIgnoreCase(signPrefix)) {
+
+				if (cfgPrefixCodes.length() > 15) {
+
+					sign.setLine(0, ChatColor.DARK_RED + cfgPrefix);
+
+					return true;
+
+				}
+
+				sign.setLine(0, ChatColor.DARK_RED + cfgPrefix);
+
+				break;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Marks the sign in the given SignChangeEvent to be unusable by giving it a red prefix.
+	 * 
+	 * @param e Event to use.
+	 * @param warnPlayer Whether to tell the player, if the prefix is too long, that the prefix is too long.
+	 * @return {@code true} if the sign is invalid because the prefix is too long.
+	 */
+	public boolean markSignInvalid(SignChangeEvent e, boolean warnPlayer) {
 
 		List<String> cfgPrefixList = this.getCfgPrefixes();
 
@@ -367,7 +390,8 @@ public class Signs {
 
 					e.setLine(0, ChatColor.DARK_RED + cfgPrefix);
 
-					e.getPlayer().sendMessage(Msgs.PrefixTooLong());
+					if (warnPlayer)
+						e.getPlayer().sendMessage(Msgs.PrefixTooLong());
 
 					return true;
 
@@ -389,7 +413,7 @@ public class Signs {
 	 * Marks the sign in the given SignChangeEvent to be usable by giving it a valid SignTP prefix.
 	 * If the prefix is too long (> 15 characters), it will mark the sign as invalid, as if it were being marked by markSignInvalid.
 	 * 
-	 * @param e - Event to use.
+	 * @param e Event to use.
 	 */
 	public void markSignUsable(SignChangeEvent e) {
 
@@ -417,13 +441,14 @@ public class Signs {
 
 				}
 
+				// I worked very hard on this code. And apparently it did nothing all this time.
+				// Removed since v1.0.4
+
+				/*
 				StringBuffer newPrefix = new StringBuffer(signPrefix);
 
 				char[] lowerCases = new String("abcdefghijklmnopqrstuvwxyz").toCharArray();
 
-				/**
-				 * Simply contains lower-case letters, so I can check if a char is lower-cased.
-				 */
 				List<Character> lowerCList = new ArrayList<Character>();
 
 				for (char c : lowerCases)
@@ -432,9 +457,6 @@ public class Signs {
 
 				char[] upperCases = new String("ABCDEFGHIJKLMNOPQRSTUVWXYZ").toCharArray();
 
-				/**
-				 * Simply contains upper-case letters, so I can check if a char is upper case.
-				 */
 				List<Character> upperCList = new ArrayList<Character>();
 
 				for (char c : upperCases)
@@ -462,6 +484,7 @@ public class Signs {
 					index++;
 
 				}
+				 */
 
 				e.setLine(0, Colors.toChatColors(cfgPrefixColored));
 
@@ -474,14 +497,43 @@ public class Signs {
 	}
 
 	/**
+	 * Marks the sign price invalid by making it red, as well as marks the entire sign unusable.
+	 * 
+	 * @param sign Sign to use.
+	 */
+	public void markPriceInvalid(Sign sign) {
+
+		this.markSignInvalid(sign);
+
+		sign.setLine(3, ChatColor.RED + ChatColor.stripColor(sign.getLine(3)));
+
+		sign.update();
+
+	}
+
+	/**
+	 * Marks the sign price invalid by making it red, as well as marks the entire thing unusable.
+	 * This uses the markSignInvalid(SignChangeEvent) method, and will not tell the player whether the sign prefix is too long upon creation.
+	 * 
+	 * @param e SignChangeEvent to use.
+	 */
+	public void markPriceInvalid(SignChangeEvent e) {
+
+		this.markSignInvalid(e, false);
+
+		e.setLine(3, ChatColor.RED + ChatColor.stripColor(e.getLine(3)));
+
+	}
+
+	/**
 	 * Gets the amount of money required to use the given sign, in the format that the server's economy plugin wants it. For example, 1.23
 	 * 
-	 * @param sign - Sign to get the price of.
+	 * @param sign Sign to get the price of.
 	 * @return The double value of the amount of money required to use the sign. 0.0 if economy is disabled.
 	 */
 	public double getPrice(Sign sign) {
 
-		String priceLine = sign.getLine(3).replace(M.getConfig().getString("pricetag"), "");
+		String priceLine = ChatColor.stripColor(sign.getLine(3).replace(M.getConfig().getString("pricetag"), ""));
 
 		if (priceLine.equals(""))
 
@@ -534,12 +586,12 @@ public class Signs {
 	/**
 	 * Gets the amount of money required to use the given sign, in the format that the server's economy plugin wants it. For example, 1.23
 	 * 
-	 * @param e - Event to use.
+	 * @param e Event to use.
 	 * @return The double value of the amount of money required to use the sign. 0.0 if economy is disabled.
 	 */
 	public double getPrice(SignChangeEvent e) {
 
-		String priceLine = e.getLine(3).replace(M.getConfig().getString("pricetag"), "");
+		String priceLine = ChatColor.stripColor(e.getLine(3).replace(M.getConfig().getString("pricetag"), ""));
 
 		if (priceLine.equals(""))
 
@@ -592,7 +644,7 @@ public class Signs {
 	/**
 	 * Checks if the given sign has a correctly formatted pricetag, according to the server's economy management plugin.
 	 * 
-	 * @param sign - Sign to check.
+	 * @param sign Sign to check.
 	 * @return {@code true} if the sign has a correctly formatted pricetag.
 	 */
 	/*public boolean hasPriceFormat(Sign sign) {
@@ -642,141 +694,179 @@ public class Signs {
 	/**
 	 * Gives the sign a price with the same currency format as the server's economy plugin.
 	 * 
-	 * @param sign - Sign to manipulate.
+	 * @param sign Sign to manipulate.
+	 * @return Whether the price successfully formatted.
 	 */
-	public void formatPrice(Sign sign) {
-
-		if (this.getPrice(sign) == 0D) {
-
-			sign.setLine(3, "");
-
-			return;
-
-		}
-
-		String price = String.valueOf(this.getPrice(sign));
+	public boolean formatPrice(Sign sign) {
 		
-		String stringPrice = sign.getLine(3);
+		String line = ChatColor.stripColor(sign.getLine(3));
 
-		int decIndex = 0;
+		try {
 
-		for (char c : price.toCharArray())
+			if (this.getPrice(sign) == 0D) {
 
-			if (c != '.')
-				decIndex++;
+				sign.setLine(3, "");
 
-		boolean allZeroes = true;
-
-		for (char c : price.substring(decIndex + 1).toCharArray())
-
-			if (c != '0')
-				allZeroes = false;
-
-		if (allZeroes && M.getConfig().getBoolean("trimZeroes"))
-			price = price.substring(0, decIndex);
-
-		if (!M.getConfig().getString("pricetag").isEmpty())
-
-			switch (M.getConfig().getString("pricetagPosition")) {
-
-			case "after":
-				sign.setLine(3, price + M.getConfig().getString("pricetag"));
-				break;
-
-			case "both":
-				sign.setLine(3, M.getConfig().getString("pricetag") + price + M.getConfig().getString("pricetag"));
-				break;
-
-			case "either":
-				int length = stringPrice.length() % 2 == 0 ? stringPrice.length() - 1 : stringPrice.length();
-				String firstHalf = price.substring(0, length / 2 - 1);
-				String secondHalf = price.substring(length / 2, price.length() - 1);
-
-				if (firstHalf.contains(M.getConfig().getString("pricetag")))
-					sign.setLine(3, M.getConfig().getString("pricetag") + price);
-				
-				else if (secondHalf.contains(M.getConfig().getString("pricetag")))
-					sign.setLine(3, price + M.getConfig().getString("pricetag"));
-				
-				break;
-
-			default:
-			case "before":
-				sign.setLine(3, M.getConfig().getString("pricetag") + price);
-				break;
+				return true;
 
 			}
+
+			String price = String.valueOf(this.getPrice(sign));
+
+			String stringPrice = line;
+
+			String zeroesPrice = line.replace(M.getConfig().getString("pricetag"), "");
+
+			int decIndex = 0;
+
+			for (char c : zeroesPrice.toCharArray())
+
+				if (c != '.')
+					decIndex++;
+
+			boolean allZeroes = true;
+
+			for (char c : zeroesPrice.substring(decIndex).toCharArray())
+
+				if (c != '0')
+					allZeroes = false;
+
+			if (allZeroes) {
+
+				if (M.getConfig().getBoolean("trimZeroes"))
+					price = zeroesPrice.substring(0, decIndex - 1);
+
+				else
+					price = zeroesPrice;
+
+			}
+
+			if (!M.getConfig().getString("pricetag").isEmpty())
+
+				switch (M.getConfig().getString("pricetagPosition")) {
+
+				case "after":
+					sign.setLine(3, price + M.getConfig().getString("pricetag"));
+					break;
+
+				case "both":
+					sign.setLine(3, M.getConfig().getString("pricetag") + price + M.getConfig().getString("pricetag"));
+					break;
+
+				case "either":
+					int length = stringPrice.length() % 2 == 0 ? stringPrice.length() - 1 : stringPrice.length();
+					String firstHalf = stringPrice.substring(0, length / 2);
+					String secondHalf = stringPrice.substring(length / 2, stringPrice.length() - 1);
+
+					if (firstHalf.contains(M.getConfig().getString("pricetag")))
+						sign.setLine(3, M.getConfig().getString("pricetag") + price);
+
+					else if (secondHalf.contains(M.getConfig().getString("pricetag")))
+						sign.setLine(3, price + M.getConfig().getString("pricetag"));
+
+					break;
+
+				default:
+				case "before":
+					sign.setLine(3, M.getConfig().getString("pricetag") + price);
+					break;
+
+				}
+
+			sign.update();
+			
+			return true;
+
+		} catch (Exception e) { return false; }
 
 	}
 
 	/**
 	 * Gives the sign a price with the same currency format as the server's economy plugin.
 	 * 
-	 * @param e - Event to use.
+	 * @param e Event to use.
+	 * @return Whether the price successfully formatted.
 	 */
-	public void formatPrice(SignChangeEvent e) {
+	public boolean formatPrice(SignChangeEvent e) {
 
-		if (this.getPrice(e) == 0D) {
+		String line = ChatColor.stripColor(e.getLine(3));
 
-			e.setLine(3, "");
+		try {
 
-			return;
+			if (this.getPrice(e) == 0D) {
 
-		}
+				e.setLine(3, "");
 
-		String price = String.valueOf(this.getPrice(e));
-		
-		String stringPrice = e.getLine(3);
-
-		int decIndex = 0;
-
-		for (char c : price.toCharArray())
-
-			if (c != '.')
-				decIndex++;
-
-		boolean allZeroes = true;
-
-		for (char c : price.substring(decIndex + 1).toCharArray())
-
-			if (c != '0')
-				allZeroes = false;
-
-		if (allZeroes && M.getConfig().getBoolean("trimZeroes"))
-			price = price.substring(0, decIndex);
-
-		if (!M.getConfig().getString("pricetag").isEmpty())
-
-			switch (M.getConfig().getString("pricetagPosition")) {
-
-			case "after":
-				e.setLine(3, price + M.getConfig().getString("pricetag"));
-				break;
-
-			case "both":
-				e.setLine(3, M.getConfig().getString("pricetag") + price + M.getConfig().getString("pricetag"));
-				break;
-
-			case "either":
-				int length = stringPrice.length() % 2 == 0 ? stringPrice.length() - 1 : stringPrice.length();
-				String firstHalf = price.substring(0, length / 2 - 1);
-				String secondHalf = price.substring(length / 2, price.length() - 1);
-
-				if (firstHalf.contains(M.getConfig().getString("pricetag")))
-					e.setLine(3, M.getConfig().getString("pricetag") + price);
-				
-				else if (secondHalf.contains(M.getConfig().getString("pricetag")))
-					e.setLine(3, price + M.getConfig().getString("pricetag"));
-				
-				break;
-
-			default:
-			case "before":
-				e.setLine(3, M.getConfig().getString("pricetag") + price);
-				break;
+				return true;
 
 			}
 
+			String price = String.valueOf(this.getPrice(e));
+
+			String stringPrice = line;
+
+			String zeroesPrice = line.replace(M.getConfig().getString("pricetag"), "");
+
+			int decIndex = 0;
+
+			for (char c : zeroesPrice.toCharArray())
+
+				if (c != '.')
+					decIndex++;
+
+			boolean allZeroes = true;
+
+			for (char c : zeroesPrice.substring(decIndex).toCharArray())
+
+				if (c != '0')
+					allZeroes = false;
+
+			if (allZeroes) {
+
+				if (M.getConfig().getBoolean("trimZeroes"))
+					price = zeroesPrice.substring(0, decIndex - 1);
+
+				else
+					price = zeroesPrice;
+
+			}
+
+			if (!M.getConfig().getString("pricetag").isEmpty())
+
+				switch (M.getConfig().getString("pricetagPosition")) {
+
+				case "after":
+					e.setLine(3, price + M.getConfig().getString("pricetag"));
+					break;
+
+				case "both":
+					e.setLine(3, M.getConfig().getString("pricetag") + price + M.getConfig().getString("pricetag"));
+					break;
+
+				case "either":
+					int length = stringPrice.length() % 2 == 0 ? stringPrice.length() - 1 : stringPrice.length();
+					String firstHalf = stringPrice.substring(0, length / 2);
+					String secondHalf = stringPrice.substring(length / 2, stringPrice.length() - 1);
+
+					if (firstHalf.contains(M.getConfig().getString("pricetag")))
+						e.setLine(3, M.getConfig().getString("pricetag") + price);
+
+					else if (secondHalf.contains(M.getConfig().getString("pricetag")))
+						e.setLine(3, price + M.getConfig().getString("pricetag"));
+
+					break;
+
+				default:
+				case "before":
+					e.setLine(3, M.getConfig().getString("pricetag") + price);
+					break;
+
+				}
+			
+			return true;
+
+		} catch (Exception ex) { return false; }
+		
 	}
 
 }

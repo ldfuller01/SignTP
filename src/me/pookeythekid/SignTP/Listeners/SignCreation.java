@@ -55,17 +55,17 @@ public class SignCreation implements Listener {
 
 					if (M.getConfig().getBoolean("useEconomy"))
 						p.sendMessage(Msgs.EcoOffError());
-					
+
 					else
 						p.sendMessage(Msgs.EcoOffWarn());
 
 				}
 
-				if (M.economyIsOn) {
+				if (M.economyIsOn && Signs.signHasPrice(e)) {
 
 					if (Signs.signPriceInvalid(e)) {
 
-						Signs.markSignInvalid(e);
+						Signs.markPriceInvalid(e);
 
 						p.sendMessage(Msgs.InvalidPrice());
 
@@ -77,25 +77,15 @@ public class SignCreation implements Listener {
 
 				}
 
-			} else if (!p.hasPermission(Permissions.createSign)) {
+			} else if (!p.hasPermission(Permissions.createSign))
 
 				e.setLine(0, ChatColor.BLACK + Colors.noChatColors(M.getConfig().getString("signPrefix")));
 
-			}
+		} else if (Signs.signHasPrefix(e) && p.hasPermission(Permissions.createSign))
 
-		} else if (!Signs.signIsValid(e)
-				&& Signs.signHasPrefix(e)
-				&& p.hasPermission(Permissions.createSign)) {
-
-			if (!Signs.markSignInvalid(e))
+			if (!Signs.markSignInvalid(e, true))
 
 				p.sendMessage(Msgs.SpecifyWarp());
-
-		}
-
-
-
-
 
 	}
 

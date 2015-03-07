@@ -14,7 +14,6 @@ import me.pookeythekid.SignTP.api.ReloadWarps;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -66,48 +65,48 @@ public class Main extends JavaPlugin {
 	private ReloadWarps ReloadWarps = new ReloadWarps(this);
 
 
+	private boolean enabledOnce = false;
+
 	public boolean economyIsOn = false;
 
 	public static Economy economy = null;
 
 	private boolean setupEconomy()
-    {
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-            economy = economyProvider.getProvider();
-        }
+	{
+		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+		if (economyProvider != null) {
+			economy = economyProvider.getProvider();
+		}
 
-        return (economy != null);
-    }
-	
-	public void disable() {
-		
-		this.setEnabled(false);
-		
+		return (economy != null);
 	}
-	
+
+	public void disable() {
+
+		this.setEnabled(false);
+
+	}
+
 	public void enable() {
-		
+
 		this.setEnabled(true);
-		
+
 	}
 
 	@Override
 	public void onEnable() {
 
-		PluginDescriptionFile pdf = this.getDescription();
-
 		if (!setupEconomy() && getConfig().getBoolean("useEconomy")) {
 
 			economyIsOn = false;
 
-			logger.severe("[" + pdf.getName() +  "] Error setting up economy with Vault! Proceeding without economy!");
+			logger.severe("Error setting up economy with Vault! Proceeding without economy!");
 
 		} else if (getConfig().getBoolean("useEconomy")) {
 
 			economyIsOn = true;
 
-			logger.info("[" + pdf.getName() + "] Successfully linked to Vault.");
+			logger.info("Successfully linked to Vault.");
 
 		}
 
@@ -115,12 +114,16 @@ public class Main extends JavaPlugin {
 
 		Permissions.registerPerms(pm);
 
-		pm.registerEvents(SignCreation, this);
+		if (!enabledOnce) {
 
-		pm.registerEvents(SignUsage, this);
+			pm.registerEvents(SignCreation, this);
 
-		pm.registerEvents(ChatListener, this);
+			pm.registerEvents(SignUsage, this);
 
+			pm.registerEvents(ChatListener, this);
+
+		}
+		
 		getCommand("signtp").setExecutor(CommandHub);
 
 		ReloadWarps.reloadOldWarps();
@@ -130,9 +133,9 @@ public class Main extends JavaPlugin {
 			saveDefaultConfig();
 
 			File oldWarpsFile = new File(getDataFolder(), "warps.txt");
-			
+
 			File dir = new File(getDataFolder(), "warps");
-			
+
 			if (!dir.exists())
 
 				dir.mkdir();
@@ -201,41 +204,43 @@ public class Main extends JavaPlugin {
 				oldWarpsFile.delete();
 
 			} else {
-				
+
 				for (File file : dir.listFiles()) {
-					
+
 					if (file.getName().endsWith(".yml")) {
-						
+
 						DataFile ymlFile = new DataFile(dir + File.separator + file.getName().replace(".yml", ""), "yml");
-						
+
 						DataFile dataFile = new DataFile(dir + File.separator + file.getName().replace(".yml", ""), "txt");
-						
+
 						// Remove the ' characters from the strings. The old YAML files like single quotes, DataAPI does not.
-						
+
 						dataFile.set("x", Double.valueOf(ymlFile.getString("x").replace("'", "")));
-						
+
 						dataFile.set("y", Double.valueOf(ymlFile.getString("y").replace("'", "")));
-						
+
 						dataFile.set("z", Double.valueOf(ymlFile.getString("z").replace("'", "")));
-						
+
 						dataFile.set("pitch", Float.valueOf(ymlFile.getString("pitch").replace("'", "")));
-						
+
 						dataFile.set("yaw", Float.valueOf(ymlFile.getString("yaw").replace("'", "")));
-						
+
 						dataFile.set("world", ymlFile.getString("world"));
-						
+
 						file.delete();
-						
+
 					}
-					
+
 				}
-				
+
 			}
 
 		} catch (Exception e) { e.printStackTrace(); }
 
 
 		ReloadWarps.reloadWarps();
+		
+		enabledOnce = true;
 
 
 		// Old code, removed after v1.0.1.
@@ -293,9 +298,9 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		
+
 		Permissions.removePerms(getServer().getPluginManager());
-		
+
 	}
 
 

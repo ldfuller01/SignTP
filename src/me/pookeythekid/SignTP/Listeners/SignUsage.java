@@ -25,7 +25,7 @@ public class SignUsage implements Listener {
 	private Teleporting Teleporting;
 
 	private Permissions Permissions;
-	
+
 	private Msgs Msgs;
 
 	public SignUsage(Main plugin) {
@@ -37,7 +37,7 @@ public class SignUsage implements Listener {
 		Teleporting = new Teleporting(plugin);
 
 		Permissions = new Permissions();
-		
+
 		Msgs = new Msgs(plugin);
 
 	}
@@ -45,7 +45,7 @@ public class SignUsage implements Listener {
 
 	@EventHandler
 	public void onSignUse(PlayerInteractEvent e) {
-		
+
 		Economy economy = Main.economy;
 
 		Player p = e.getPlayer();
@@ -60,7 +60,7 @@ public class SignUsage implements Listener {
 				Sign sign = (Sign) clickedBlock.getState();
 
 				if (Signs.signIsValid(sign)) {
-					
+
 					/*
 					 * Cancels the event so the player doesn't accidentally place a block on the sign.
 					 * Moved from the next block to this one, so players without permission can't build
@@ -69,26 +69,34 @@ public class SignUsage implements Listener {
 					e.setCancelled(true);
 
 					if (p.hasPermission(Permissions.useSign)) {
-						
+
 						if (!M.economyIsOn || !Signs.signHasPrice(sign))
 
 							Teleporting.teleport(p, null, sign.getLine(1));
 
 						else if (M.economyIsOn && Signs.signHasPrice(sign)) {
-							
+
 							Signs.formatPrice(sign);
 
-							double price = Signs.getPrice(sign);
+							if (!Signs.signPriceInvalid(sign)) {
 
-							if (economy.has(p, price)) {
+								double price = Signs.getPrice(sign);
 
-								economy.withdrawPlayer(p, price);
+								if (economy.has(p, price)) {
 
-								Teleporting.teleport(p, null, sign.getLine(1));
+									economy.withdrawPlayer(p, price);
 
-							} else if (!economy.has(p, price))
+									Teleporting.teleport(p, null, sign.getLine(1));
 
-								p.sendMessage(Msgs.NotEnoughCash());
+								} else if (!economy.has(p, price))
+
+									p.sendMessage(Msgs.NotEnoughCash());
+
+							}
+
+							else
+
+								Signs.markPriceInvalid(sign);
 
 						}
 

@@ -125,8 +125,8 @@ public class Msgs {
 
 	public String InvalidPrice() {
 
-		return (Tag() + ChatColor.RED + "Error: " + ChatColor.GOLD + "Invalid sign price. Prefix price with a $ sign, and only use digits, "
-				+ "with the exception of a decimal point. Don't use negative numbers, either.");
+		return (Tag() + ChatColor.RED + "Error: " + ChatColor.GOLD + "Invalid sign price. You must insert a correct currency sign "
+				+ "according to the config, and only use digits with the exception of a decimal point. Don't use negative numbers, either.");
 
 	}
 
